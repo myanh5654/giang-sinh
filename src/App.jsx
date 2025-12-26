@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 const ChristmasMystery = () => {
   const [step, setStep] = useState(0); // 0: Warning, 1: Logs, 2: Message, 3: GiftBox
   const [logs, setLogs] = useState([]);
   const [isGiftOpened, setIsGiftOpened] = useState(false);
   const [isLogDone, setIsLogDone] = useState(false); // Biến kiểm tra xem log đã chạy xong chưa
+
+  // --- THÊM MỚI: Tạo một cái mỏ neo để kéo màn hình xuống ---
+  const logEndRef = useRef(null);
 
   // Kịch bản Log điều tra (Đã chỉnh delay chậm hơn)
   const logData = [
@@ -37,6 +40,12 @@ const ChristmasMystery = () => {
     }
   }, [step]);
 
+  // --- THÊM MỚI: Tự động cuộn xuống mỗi khi có dòng log mới ---
+  useEffect(() => {
+    // Mỗi khi danh sách logs thay đổi, cuộn xuống cái mỏ neo (logEndRef)
+    logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [logs]);
+
   // Hàm xử lý khi bấm vào màn hình Terminal
   const handleTerminalClick = () => {
     if (isLogDone) {
@@ -62,7 +71,7 @@ const ChristmasMystery = () => {
         </div>
       )}
 
-      {/* --- MÀN HÌNH 2: TERMINAL LOGS (Đã sửa click) --- */}
+      {/* --- MÀN HÌNH 2: TERMINAL LOGS (Đã sửa click + auto scroll) --- */}
       {step === 1 && (
         <div 
           className="w-full max-w-lg bg-gray-900 p-6 rounded-lg shadow-2xl border border-green-800 h-[60vh] overflow-y-auto font-mono text-sm md:text-base cursor-pointer"
@@ -82,6 +91,9 @@ const ChristmasMystery = () => {
               </p>
             ))}
             {!isLogDone && <span className="animate-pulse inline-block w-2 h-4 bg-green-500 ml-1"></span>}
+            
+            {/* --- THÊM MỚI: Đây là cái mỏ neo vô hình nằm dưới cùng --- */}
+            <div ref={logEndRef} />
           </div>
         </div>
       )}
